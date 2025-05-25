@@ -7,6 +7,6 @@ const teamSchema = new mongoose.Schema({
     tasks: { type: [mongoose.Schema.Types.ObjectId], ref: 'Task', required: true },
 })
 
-const Team = mongoose.model('Team', teamSchema)
+const Team = mongoose.model('teams', teamSchema)
 
 export default Team

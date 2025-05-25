@@ -1,7 +1,6 @@
 import dotenv from 'dotenv'
 import express from 'express'
 import routerAPI from './routes/routes.api.js'
-import home from './controllers/controllers.home.js'
 import connection from './config/config.database.js'
 dotenv.config()
 
@@ -12,7 +11,6 @@ const port = process.env.PORT || 2309
 await connection()
 
 app.use(express.json())
-app.get('/', home)
 app.use('/api', routerAPI)
 
 try {
