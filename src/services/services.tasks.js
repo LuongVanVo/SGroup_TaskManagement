@@ -1,6 +1,7 @@
 import Task from '../model/model.tasks.js';
 import Comment from '../model/model.comments.js';
 import User from '../model/model.users.js';
+import Team from '../model/model.teams.js';
 
 // create after login by admin
 const createNewTask = async (taskData) => {
@@ -18,6 +19,15 @@ const createNewTask = async (taskData) => {
             comments: taskData.comments,
             createdAt: new Date().toISOString()
         })
+        // save task in teams
+        if (taskData.teamId) {
+            const team = await Team.findById(taskData.teamId);
+            if (!team) {
+                throw new Error('Team not found');
+            }
+            team.tasks.push(newTask._id);
+            await team.save();
+        }
         return newTask
     } catch (error) {
         throw new Error(error);

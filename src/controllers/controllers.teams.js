@@ -10,6 +10,22 @@ const getAllTeams = async (req, res) => {
     }
 }
 
+// get team by id
+const getTeamByID = async (req, res) => {
+    try {
+        const { teamID } = req.params
+        const team = await servicesTeams.getTeamByIdService(teamID)
+        if (!team) {
+            return res.status(404).json({ message: 'Team not found' })
+        }
+        return res.status(200).json({
+            message: 'Get team successfully',
+            team
+        })
+    } catch(error) {
+        return res.status(500).json({ message: error.message })
+    }
+}
 // create a new team
 const createTeam = async (req, res) => {
     try {
@@ -72,5 +88,6 @@ export default {
     createTeam,
     addMemberToTeam,
     getMembersInTeam,
-    deleteMemberFromTeam
+    deleteMemberFromTeam,
+    getTeamByID
 }

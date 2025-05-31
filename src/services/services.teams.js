@@ -5,12 +5,78 @@ import Member from '../model/model.users.js'
 const getAllTeamsService = async () => {
     try {
         const teams = await Team.find()
-        return teams
+            .populate({
+                path: 'members',
+                model: 'members',
+                select: 'userName'
+            })
+            .populate({
+                path: 'tasks',
+                model: 'tasks',
+                select: 'title description'
+            })
+        if (teams.length === 0) {
+            throw new Error('No teams found')
+        }
+        // Format teams to include only necessary fields
+        const formattedTeams = teams.map(team => {
+            return {
+                id: team._id,
+                teamID: team.teamID,
+                name: team.name,
+                tasks: team.tasks.map(task => ({
+                    id: task._id,
+                    title: task.title,
+                    description: task.description
+                })),
+                members: team.members.map(member => ({
+                    id: member._id,
+                    userName: member.userName
+                }))
+            }
+        })
+        return formattedTeams
     } catch (error) {
         throw new Error(error)
     }
 }
 
+// get team by id
+const getTeamByIdService = async (teamID) => {
+    try {
+        const team = await Team.findById(teamID)
+            .populate({
+                path: 'members',
+                model: 'members',
+                select: 'userName'
+            })
+            .populate({
+                path: 'tasks',
+                model: 'tasks',
+                select: 'title description'
+            })
+        if (!team) {
+            throw new Error('Team not found')
+        }
+        const formattedTeams = {
+            id: team._id,
+            teamID: team.teamID,
+            name: team.name,
+            tasks: team.tasks.map(task => ({
+                    id: task._id,
+                    title: task.title,
+                    description: task.description
+                })),
+            members: team.members.map(member => ({
+                id: member._id,
+                userName: member.userName
+            }))
+        }
+        return formattedTeams
+    } catch (error) {
+        throw new Error(error)
+    }
+}
 // create a new team
 const createTeamService = async (teamData) => {
     try {
@@ -105,5 +171,6 @@ export default {
     createTeamService,
     addMemberToTeamService,
     getMembersInTeamService,
-    deleteMemberFromTeamService
+    deleteMemberFromTeamService,
+    getTeamByIdService
 }

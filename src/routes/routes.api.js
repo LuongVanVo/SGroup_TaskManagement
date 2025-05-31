@@ -8,17 +8,20 @@ import { requireAdminRole } from '../middlewares/middleware.requireAdminRole.js'
 import { checkEmailExist } from '../middlewares/middleware.checkEmailExist.js'
 import { authTokenMiddleWare } from '../middlewares/middleware.auth.js'
 import { checkDueTimeMiddleware } from '../middlewares/middleware.checkDueTime.js'
+import { checkTeamIDMiddleware } from '../middlewares/middleware.checkTeamID.js'
+import { checkRoleAdminMiddleware } from '../middlewares/middleware.checkRoleAdmin.js'
 const routerAPI = express.Router()
 
 routerAPI.get('/teams', teams.getAllTeams)
-routerAPI.post('/teams', teams.createTeam)
+routerAPI.get('/teams/:teamID', teams.getTeamByID)
+routerAPI.post('/teams', checkTeamIDMiddleware, teams.createTeam)
 
 routerAPI.post('/newMember', members.createMember)
 routerAPI.get('/getAllMember', members.getAllMember)
 
-routerAPI.post('/addMemberToTeam', teams.addMemberToTeam)
+routerAPI.post('/addMemberToTeam', checkRoleAdminMiddleware, teams.addMemberToTeam)
 routerAPI.get('/getMembersInTeam', teams.getMembersInTeam)
-routerAPI.delete('/deleteMemberFromTeam', teams.deleteMemberFromTeam)
+routerAPI.delete('/deleteMemberFromTeam', requireAdminRole, teams.deleteMemberFromTeam)
 
 // member 
 // register a new member
