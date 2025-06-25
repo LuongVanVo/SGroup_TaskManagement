@@ -9,6 +9,8 @@ const memberSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now },
     tasks: { type: [mongoose.Schema.Types.ObjectId], ref: 'Task', required: true },
     teams: { type: [mongoose.Schema.Types.ObjectId], ref: 'Team', required: true },
+    passwordResetToken: { type: String },
+    passwordResetExpires: { type: Date },
 })
 
 const Member = mongoose.model('members', memberSchema)

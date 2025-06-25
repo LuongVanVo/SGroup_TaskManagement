@@ -208,6 +208,8 @@ const deleteTaskService = async (taskId) => {
         }
         // xoa task
         await Task.deleteOne({ _id: taskId })
+        // xoa comment trong task
+        await Comment.deleteMany({ taskId: taskId })
         return task
     } catch (err) {
         throw new Error(err);

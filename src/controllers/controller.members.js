@@ -1,3 +1,4 @@
+import Member from '../model/model.users.js';
 import servicesMembers from '../services/services.members.js'
 
 // create a new member
@@ -114,6 +115,27 @@ const updateProfileInfo = async (req, res) => {
             })
         }
         const { userName, email, fullName } = req.body
+        if (!userName && !email && !fullName) {
+            return res.status(400).json({
+                "success": false,
+                "message": "At least one field (userName, email, fullName) must be provided"
+            });
+        }
+        
+        // Nếu có email mới, kiểm tra xem email đã được sử dụng bởi thành viên khác chưa
+        if (email) {
+            const existingMember = await Member.findOne({
+                email: email
+            });
+            
+            if (existingMember) {
+                return res.status(400).json({
+                    "success": false,
+                    "message": "Email is already in use by another member"
+                });
+            }
+        }
+        
         const updateData = await servicesMembers.updateProfileMemberService(token, req.body)
         if (!updateData) {
             return res.status(400).json({
@@ -133,6 +155,53 @@ const updateProfileInfo = async (req, res) => {
         })
     }
 }
+
+const forgotPassword = async (req, res) => {
+    const { email } = req.body
+    try {
+        const member = await servicesMembers.forgotPasswordService(email)
+        if (!member) {
+            return res.status(404).json({
+                "success": false,
+                "message": "Member not found"
+            })
+        }
+        return res.status(200).json({
+            "success": true,
+            "message": "Password reset link sent to your email"
+        })
+    } catch (error) {
+        return res.status(500).json({
+            "success": false,
+            "message": error.message
+        })
+    }
+}
+
+const resetPassword = async (req, res) => {
+    // get the token from authorization header
+    const authHeader = req.headers['authorization']
+    const token = authHeader && authHeader.split(' ')[1]
+    if (!token) {
+        return res.status(401).json({
+            "success": false,
+            "message": "Unauthorized: no token provided"
+        }) 
+    }
+    const { newPassword, email } = req.body
+    try {
+        const result = await servicesMembers.resetPasswordService(token, newPassword, email)
+        return res.status(200).json({
+            "success": true,
+            "message": result.message
+        })
+    } catch (error) {
+        return res.status(500).json({
+            "success": false,
+            "message": error.message
+        })
+    }
+}
 export default {
     createMember,
     getAllMember,
@@ -140,5 +209,7 @@ export default {
     registerMemberAdmin,
     loginMember,
     getMemberByToken,
-    updateProfileInfo
+    updateProfileInfo,
+    forgotPassword,
+    resetPassword
 }

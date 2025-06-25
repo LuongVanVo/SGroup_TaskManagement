@@ -2,6 +2,7 @@ import Member from '../model/model.users.js'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
+import nodemailer from 'nodemailer'
 dotenv.config()
 
 const salt = 10
@@ -188,6 +189,76 @@ const updateProfileMemberService = async (token, memberData) => {
         throw new Error('Token not found 2')
     }
 }
+
+// send email with token, npm mailer 
+const transporter = nodemailer.createTransport({
+    service: process.env.EMAIL_SERVICE,
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    }
+})
+
+async function forgotPasswordService(email) {
+    try{
+        const member = await Member.findOne({ email })
+        if (!member) {
+            throw new Error('Member not found')
+        }
+        const payload = {
+            email: member.email
+        }
+        const resetToken = await jwt.sign(
+            payload, 
+            process.env.JWT_SECRET,
+            {
+                expiresIn: 7 * 60 // 7 minutes
+            }
+        )
+        member.passwordResetToken = resetToken
+        member.passwordResetExpires = new Date(Date.now() + 7 * 60 * 1000) // 7 minutes
+        await member.save()
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: member.email,
+            subject: 'Password Reset Request',
+            html: `<p>Your reset token is:<strong>${resetToken}</strong></p>`
+        }
+        await transporter.sendMail(mailOptions)
+        return {
+            success: true,
+            message: 'Reset token sent to your email'
+        }
+    } catch (error) {
+        throw new Error(error)
+    }
+}
+
+async function resetPasswordService(token, newPassword, email) {
+    try {
+        const member = await Member.findOne({
+            passwordResetToken: token,
+            email: email,
+        })
+        if (!member) {
+            throw new Error('Invalid token or email')
+        }
+        if (member.passwordResetExpires < new Date()) {
+            throw new Error('Token expired')
+        }
+        member.password = await bcrypt.hash(newPassword, salt)
+        member.passwordResetToken = undefined
+        member.passwordResetExpires = undefined
+        await member.save()
+        return {
+            success: true,
+            message: 'Password reset successfully'
+        }
+    } catch (error) {
+        throw new Error(error)
+    }
+}
 export default {
     createMemberService,
     getAllMembersService,
@@ -195,5 +266,7 @@ export default {
     registerMemberAdminService,
     loginMemberService,
     getMemberByTokenService,
-    updateProfileMemberService
+    updateProfileMemberService,
+    forgotPasswordService,
+    resetPasswordService
 }

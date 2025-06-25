@@ -14,7 +14,7 @@ const routerAPI = express.Router()
 
 routerAPI.get('/teams', teams.getAllTeams)
 routerAPI.get('/teams/:teamID', teams.getTeamByID)
-routerAPI.post('/teams', checkTeamIDMiddleware, teams.createTeam)
+routerAPI.post('/teams', checkTeamIDMiddleware, requireAdminRole, teams.createTeam)
 
 routerAPI.post('/newMember', members.createMember)
 routerAPI.get('/getAllMember', members.getAllMember)
@@ -30,10 +30,14 @@ routerAPI.post('/registerMember',checkEmailExist, members.registerMember)
 routerAPI.post('/registerMemberAdmin', checkEmailExist, members.registerMemberAdmin)
 // login a get jwt token
 routerAPI.post('/loginMember', members.loginMember)
-// // get info member by jwt token
+// get info member by jwt token
 routerAPI.get('/members/me', members.getMemberByToken)
-// // update member
+// update member
 routerAPI.patch('/members/me', members.updateProfileInfo)
+// send reset password email
+routerAPI.post('/members/forgot-password', members.forgotPassword)
+// reset password
+routerAPI.post('/members/reset-password', members.resetPassword)
 
 // tasks
 routerAPI.post('/tasks', requireAdminRole, tasks.createTask)

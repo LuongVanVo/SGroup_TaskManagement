@@ -96,7 +96,7 @@ const addMemberToTeamService = async (teamID, memberID) => {
             throw new Error('Team not found')
         }
         if (!member) {
-            throw new Error('Member not fount')
+            throw new Error('Member not found')
         }
         // check member exist in team
         if (team.members.includes(memberID)) {
