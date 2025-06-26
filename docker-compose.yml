@@ -1,0 +1,30 @@
+services:
+  db:
+    image: mongo:latest
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: user
+      MONGO_INITDB_ROOT_PASSWORD: password
+    ports:
+      - "27017:27017"
+
+  app:
+    depends_on:
+      - db
+    env_file:
+      - .env
+    image: luongvanvo/sgroup-taskmanagement:latest
+    environment:
+      - PORT=${PORT}
+      - MONGO_DB_URL=${MONGO_DB_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - JTW_EXPIRES_IN=${JWT_EXPIRES_IN}
+      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
+      - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
+      - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME}
+      - EMAIL_SERVICE=${EMAIL_SERVICE}
+      - EMAIL_USER=${EMAIL_USER}
+      - EMAIL_PASS=${EMAIL_PASS}
+    ports:
+      - ${PORT}:${PORT}
+    restart: always
