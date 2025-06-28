@@ -66,8 +66,8 @@ jobs:
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/sgroup_betaskmanagement:latest
 
             # Stop and remove existing containers (if any)
-            sudo docker compose down || true
+            sudo docker-compose down || true
 
             # Start services
-            sudo docker compose up -d
+            sudo docker-compose up -d
       
