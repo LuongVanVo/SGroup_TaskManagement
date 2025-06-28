@@ -42,15 +42,14 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            # Check and create new file .env
-            if [ -f .env ]; then
-              echo ".env existed";
-              rm .env || true;
-              echo ".env has been removed";
-              touch .env;
-            else 
-              touch .env;
+            # Clone repo if it does not exist
+            if [ ! -d "SGroup_TaskManagement" ]; then
+              git clone https://github.com/LuongVanVo/SGroup_TaskManagement.git
             fi 
+            cd SGroup_TaskManagement && git pull origin master
+            # Check and create new file .env
+            rm -f .env || true
+            touch .env
             # Set up file .env
             echo "PORT=${{ secrets.PORT }}" >> .env
             echo "MONGO_DB_URL=${{ secrets.MONGO_DB_URL }}" >> .env
@@ -62,12 +61,13 @@ jobs:
             echo "EMAIL_SERVICE=${{ secrets.EMAIL_SERVICE }}" >> .env
             echo "EMAIL_USER=${{ secrets.EMAIL_USER }}" >> .env
             echo "EMAIL_PASS=${{ secrets.EMAIL_PASS }}" >> .env
-            # Pull Docker Image and Run
+
+            # Pull latest Docker image
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/sgroup_betaskmanagement:latest
-            sudo docker network inspect cunity-network >/dev/null 2>&1 || docker network create cunity-network
-            sudo docker rm -f taskapp || true
-            sudo docker run -d --name taskapp --network cunity-network --env-file .env \
-            -p ${{ secrets.PORT }}:${{ secrets.PORT }} \
-            ${{ secrets.DOCKER_USERNAME }}/sgroup_betaskmanagement:latest
-    
+
+            # Stop and remove existing containers (if any)
+            sudo docker compose down || true
+
+            # Start services
+            sudo docker compose up -d
       

@@ -8,8 +8,8 @@ services:
     ports:
       - "27017:27017"
     # Thêm vào nếu bạn muốn lưu trữ dữ liệu MongoDB trên máy chủ (ví dụ: EC2)
-    # volumes:
-    #   - mongo_data:/data/db
+    volumes:
+      - mongo_data:/data/db
   app:
     depends_on:
       - db
@@ -31,5 +31,5 @@ services:
       - ${PORT}:${PORT}
     restart: always
 # Thêm vào nếu bạn muốn lưu trữ dữ liệu ứng dụng trên máy chủ (ví dụ: EC2)
-# volumes:
-#   mongo_data:
+volumes:
+  mongo_data:
