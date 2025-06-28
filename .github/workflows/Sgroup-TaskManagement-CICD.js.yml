@@ -63,10 +63,10 @@ jobs:
             echo "EMAIL_USER=${{ secrets.EMAIL_USER }}" >> .env
             echo "EMAIL_PASS=${{ secrets.EMAIL_PASS }}" >> .env
             # Pull Docker Image and Run
-            docker pull ${{ secrets.DOCKER_USERNAME }}/sgroup_betaskmanagement:latest
-            docker network inspect cunity-network >/dev/null 2>&1 || docker network create cunity-network
-            docker rm -f taskapp || true
-            docker run -d --name taskapp --network cunity-network --env-file .env \
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/sgroup_betaskmanagement:latest
+            sudo docker network inspect cunity-network >/dev/null 2>&1 || docker network create cunity-network
+            sudo docker rm -f taskapp || true
+            sudo docker run -d --name taskapp --network cunity-network --env-file .env \
             -p ${{ secrets.PORT }}:${{ secrets.PORT }} \
             ${{ secrets.DOCKER_USERNAME }}/sgroup_betaskmanagement:latest
     
