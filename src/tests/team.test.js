@@ -1,5 +1,5 @@
 import request from "supertest";
-import app from "../src/servers.js";
+import app from "../servers.js";
 
 describe("GET /api/teams", () => {
   it("show return all teams", async () => {
