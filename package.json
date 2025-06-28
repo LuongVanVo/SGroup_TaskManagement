@@ -7,7 +7,7 @@
   "type": "module",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "start": "nodemon src/servers.js"
   },
   "dependencies": {
@@ -15,10 +15,16 @@
     "cloudinary": "^2.6.1",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
+    "jest": "^30.0.3",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.16.0",
     "mongoose": "^8.14.3",
     "nodemailer": "^7.0.3",
-    "nodemon": "^3.1.10"
+    "nodemon": "^3.1.10",
+    "supertest": "^7.1.1"
+  },
+  "jest": {
+    "transform": {},
+    "testEnvironment": "node"
   }
 }
