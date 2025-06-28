@@ -65,6 +65,15 @@ jobs:
             # Pull latest Docker image
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/sgroup_betaskmanagement:latest
 
+            # Tìm và stop container nào đang chiếm cổng PORT
+            PORT=${{ secrets.PORT }}
+            CONTAINER_ID=$(sudo lsof -i tcp:$PORT -t || true)
+            if [ ! -z "$CONTAINER_ID" ]; then
+              echo "Port $PORT is being used by container ID $CONTAINER_ID. Stopping..."
+              sudo docker stop $CONTAINER_ID || true
+              sudo docker rm $CONTAINER_ID || true
+            fi
+
             # Stop and remove existing containers (if any)
             sudo docker-compose down || true
 
